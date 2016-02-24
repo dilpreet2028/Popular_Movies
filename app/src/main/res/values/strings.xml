@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="settings">Settings</string>
+    <string name="default_pref_list">Settings</string>
+    <string-array name="sort_list">
+        <item>Most Popular</item>
+        <item>Highest Rated</item>
+    </string-array>
+    <string-array name="sort_list_values">
+        <item>popularity</item>
+        <item>vote_count</item>
+    </string-array>
+    <string name="sort_def_value">popularity</string>
+    <string name="sort_title">Sort</string>
+    <string name="sort_key">sort</string>
+</resources>

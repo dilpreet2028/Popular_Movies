@@ -46,19 +46,18 @@ public class MainFragment extends Fragment {
         moviesList=new ArrayList<>();
         adapter=new MovieAdapter(moviesList,getActivity());
         gridView.setAdapter(adapter);
-
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Bundle bundle=new Bundle();
-                Movie currentItem=moviesList.get(position);
-                bundle.putString("title",currentItem.getTitle());
-                bundle.putString("image",currentItem.getImageLink());
-                bundle.putString("rating",currentItem.getRating());
-                bundle.putString("release",currentItem.getRelease());
-                bundle.putString("text",currentItem.getSynopsis());
-                Intent intent=new Intent(getActivity(),DetailActivity.class);
-                intent.putExtra("bundle",bundle);
+                Bundle bundle = new Bundle();
+                Movie currentItem = moviesList.get(position);
+                bundle.putString("title", currentItem.getTitle());
+                bundle.putString("image", currentItem.getImageLink());
+                bundle.putString("rating", currentItem.getRating());
+                bundle.putString("release", currentItem.getRelease());
+                bundle.putString("text", currentItem.getSynopsis());
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                intent.putExtra("bundle", bundle);
                 startActivity(intent);
 
             }
@@ -67,8 +66,10 @@ public class MainFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
+        moviesList.clear();
+        adapter.notifyDataSetChanged();
         new NetworkTask().execute();
     }
 
@@ -82,6 +83,7 @@ public class MainFragment extends Fragment {
             InputStream inputStream=null;
             Integer result=0;
             String moviesJson;
+
             preferences= PreferenceManager.getDefaultSharedPreferences(getActivity());
             String sortType=preferences.getString(getString(R.string.sort_key),getString(R.string.sort_def_value));
 

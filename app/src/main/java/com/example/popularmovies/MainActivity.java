@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    @Override
+        @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu,menu);
         return true;

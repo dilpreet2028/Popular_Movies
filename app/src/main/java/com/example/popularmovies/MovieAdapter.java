@@ -50,7 +50,7 @@ public class MovieAdapter extends BaseAdapter {
         Movie currentItem=movieList.get(position);
         String url=currentItem.getImageLink();
         String title=currentItem.getTitle();
-        Picasso.with(context).load(Config.IMAGE_URL+url).into(movieImage);
+        Picasso.with(context).load(Config.IMAGE_URL+url).placeholder(R.drawable.loading).into(movieImage);
        // movieTitle.setText(title);
         return convertView;
     }

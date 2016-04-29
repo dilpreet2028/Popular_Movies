@@ -1,6 +1,6 @@
-package com.example.popularmovies;
+package com.example.popularmovies.UI;
 
-import android.content.Intent;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -8,13 +8,18 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+
+import com.example.popularmovies.Adapters.MovieAdapter;
+import com.example.popularmovies.Utilities.Config;
+import com.example.popularmovies.Movie;
+import com.example.popularmovies.R;
+import com.example.popularmovies.Utilities.MoviesDb;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,10 +38,10 @@ import java.util.List;
  * Created by dilpreet on 23/2/16.
  */
 public class MainFragment extends Fragment {
-    List<Movie> moviesList;
+    ArrayList<Movie> moviesList;
     MovieAdapter adapter;
     GridView gridView;
-
+    OnItemClickData onItemClickData;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,20 +54,32 @@ public class MainFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Bundle bundle = new Bundle();
+
+
                 Movie currentItem = moviesList.get(position);
-                bundle.putString("title", currentItem.getTitle());
-                bundle.putString("image", currentItem.getImageLink());
-                bundle.putString("rating", currentItem.getRating());
-                bundle.putString("release", currentItem.getRelease());
-                bundle.putString("text", currentItem.getSynopsis());
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
-                intent.putExtra("bundle", bundle);
-                startActivity(intent);
+                onItemClickData.provideData(currentItem.getId(),currentItem.getTitle(),currentItem.getImageLink(),
+                        currentItem.getRating(),currentItem.getRelease(),currentItem.getSynopsis());
 
             }
         });
+
+
+
         return view;
+    }
+
+    public interface OnItemClickData{
+        public void provideData(String id,String title,String image,String rating,String release,String synopsis);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try{
+            onItemClickData=(OnItemClickData)context;
+        }catch (ClassCastException e){
+            throw new ClassCastException(getActivity().toString()+"must implement OnItemClickData");
+        }
     }
 
     @Override
@@ -70,7 +87,17 @@ public class MainFragment extends Fragment {
         super.onStart();
         moviesList.clear();
         adapter.notifyDataSetChanged();
-        new NetworkTask().execute();
+        SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortType=preferences.getString(getString(R.string.sort_key),getString(R.string.sort_def_value));
+
+        if(sortType.compareToIgnoreCase("fav")!=0)
+            new NetworkTask().execute();
+        else{
+            MoviesDb moviesDb=new MoviesDb(getActivity());
+            moviesDb.getMovies(moviesList,adapter);
+
+            Log.d("mytag","assfd");
+        }
     }
 
     private class NetworkTask extends AsyncTask<Void,Void,Integer>{
@@ -142,19 +169,21 @@ public class MainFragment extends Fragment {
     private void parseMovies(String jsonString){
         JSONObject resultObj;
         try{
+            Log.d("mytag",jsonString);
             resultObj=new JSONObject(jsonString);
             JSONArray moviesArray=resultObj.getJSONArray("results");
             JSONObject movieObject;
             Movie newMovie;
-            String title,imageLink,synopsis,rating,release;
+            String title,imageLink,synopsis,rating,release,id;
             for(int i=0;i<moviesArray.length();i++){
                 movieObject=moviesArray.getJSONObject(i);
+                id=movieObject.getString("id");
                 title=movieObject.getString("title");
                 imageLink=movieObject.getString("poster_path");
                 synopsis=movieObject.getString("overview");
                 rating=movieObject.getString("vote_average");
                 release=movieObject.getString("release_date");
-                newMovie=new Movie(title,imageLink,synopsis,rating,release);
+                newMovie=new Movie(id,title,imageLink,synopsis,rating,release);
                 moviesList.add(newMovie);
             }
         }catch (JSONException e){

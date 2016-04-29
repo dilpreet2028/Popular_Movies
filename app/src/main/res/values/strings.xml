@@ -5,10 +5,12 @@
     <string-array name="sort_list">
         <item>Most Popular</item>
         <item>Highest Rated</item>
+        <item>Favourite</item>
     </string-array>
     <string-array name="sort_list_values">
         <item>popularity</item>
         <item>vote_count</item>
+        <item>fav</item>
     </string-array>
     <string name="sort_def_value">popularity</string>
     <string name="sort_title">Sort</string>

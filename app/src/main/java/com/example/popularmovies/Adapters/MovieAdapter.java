@@ -1,4 +1,4 @@
-package com.example.popularmovies;
+package com.example.popularmovies.Adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,6 +9,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
+import com.example.popularmovies.Utilities.Config;
+import com.example.popularmovies.Movie;
+import com.example.popularmovies.R;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -50,7 +54,9 @@ public class MovieAdapter extends BaseAdapter {
         Movie currentItem=movieList.get(position);
         String url=currentItem.getImageLink();
         String title=currentItem.getTitle();
-        Picasso.with(context).load(Config.IMAGE_URL+url).placeholder(R.drawable.loading).into(movieImage);
+
+        Picasso.with(context).load(Config.IMAGE_URL+url)
+                .placeholder(R.drawable.loading).into(movieImage);
        // movieTitle.setText(title);
         return convertView;
     }

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent"
-    tools:context="com.example.popularmovies.DetailActivity">
+    tools:context=".UI.DetailActivity">
     <android.support.v7.widget.Toolbar
         android:layout_width="match_parent"
         android:id="@+id/toolbar"
@@ -14,6 +14,6 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="10dp"
+        android:layout_margin="4dp"
         android:id="@+id/frame_detail"/>
 </LinearLayout>

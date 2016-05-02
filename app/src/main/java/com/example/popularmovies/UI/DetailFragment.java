@@ -64,21 +64,26 @@ public class DetailFragment extends Fragment {
         trailerAdapter=new TrailerAdapter(listVideo,getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(trailerAdapter);
-
-        try {
-            Bundle bundle = getActivity().getIntent().getBundleExtra("bundle");
-            mId= bundle.getString("id");
-            mTitle = bundle.getString("title");
-            mImageLink= bundle.getString("image");
-            mSynopsis = bundle.getString("text");
-            mRating= bundle.getString("rating");
-            mRelease = bundle.getString("release");
-            setFields(mId,mTitle,mImageLink,mRating,mRelease,mSynopsis);
-
-        }catch (NullPointerException e){
-            Log.d("mytag","First Run");
+        if (savedInstanceState != null) {
+            reviewView.setText(savedInstanceState.getString("review"));
+            listVideo=savedInstanceState.getStringArrayList("movies");
+            Log.d("mytag","asd");
         }
+        else {
+            try {
+                Bundle bundle = getActivity().getIntent().getBundleExtra("bundle");
+                mId = bundle.getString("id");
+                mTitle = bundle.getString("title");
+                mImageLink = bundle.getString("image");
+                mSynopsis = bundle.getString("text");
+                mRating = bundle.getString("rating");
+                mRelease = bundle.getString("release");
+                setFields(mId, mTitle, mImageLink, mRating, mRelease, mSynopsis);
 
+            } catch (NullPointerException e) {
+                Log.d("mytag", "First Run");
+            }
+        }
         favImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,7 +102,14 @@ public class DetailFragment extends Fragment {
         return view;
     }
 
-    public void setFields(String id,String title, String image, String rating, String release, String synopsis){
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putStringArrayList("movies",listVideo);
+        outState.putString("review",reviewView.getText().toString());
+    }
+
+    public void setFields(String id, String title, String image, String rating, String release, String synopsis){
         mId=id;mTitle=title;mImageLink=image;mRating=rating;mRelease=release;mSynopsis=synopsis;
         Picasso.with(getActivity()).load(Config.IMAGE_URL + image).into(imageView);
 

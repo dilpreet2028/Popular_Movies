@@ -42,13 +42,21 @@ public class MainFragment extends Fragment {
     MovieAdapter adapter;
     GridView gridView;
     OnItemClickData onItemClickData;
+    boolean restored;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_main,container,false);
         gridView=(GridView)view.findViewById(R.id.gridView);
+        restored=false;
 
         moviesList=new ArrayList<>();
+        if(savedInstanceState!=null){
+            moviesList=savedInstanceState.getParcelableArrayList("data");
+            Log.d("mytag","instance");
+            restored=true;
+        }
+
         adapter=new MovieAdapter(moviesList,getActivity());
         gridView.setAdapter(adapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -68,6 +76,13 @@ public class MainFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("data",moviesList);
+    }
+
+
     public interface OnItemClickData{
         public void provideData(String id,String title,String image,String rating,String release,String synopsis);
     }
@@ -85,18 +100,23 @@ public class MainFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        moviesList.clear();
-        adapter.notifyDataSetChanged();
+
+        if(!restored)
+        fetchMovies();
+
+    }
+
+    private void fetchMovies(){
+
         SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sortType=preferences.getString(getString(R.string.sort_key),getString(R.string.sort_def_value));
-
+        Log.d("mytag","start "+ restored);
         if(sortType.compareToIgnoreCase("fav")!=0)
             new NetworkTask().execute();
         else{
             MoviesDb moviesDb=new MoviesDb(getActivity());
             moviesDb.getMovies(moviesList,adapter);
 
-            Log.d("mytag","assfd");
         }
     }
 
@@ -169,7 +189,7 @@ public class MainFragment extends Fragment {
     private void parseMovies(String jsonString){
         JSONObject resultObj;
         try{
-            Log.d("mytag",jsonString);
+            moviesList.clear();
             resultObj=new JSONObject(jsonString);
             JSONArray moviesArray=resultObj.getJSONArray("results");
             JSONObject movieObject;
@@ -185,6 +205,7 @@ public class MainFragment extends Fragment {
                 release=movieObject.getString("release_date");
                 newMovie=new Movie(id,title,imageLink,synopsis,rating,release);
                 moviesList.add(newMovie);
+
             }
         }catch (JSONException e){
              Log.d("mytag",e+"");

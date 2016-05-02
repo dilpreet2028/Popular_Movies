@@ -48,9 +48,10 @@ public class MovieAdapter extends BaseAdapter {
         if(convertView==null){
             inflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView=inflater.inflate(R.layout.grid_item,null);
-            movieImage=(ImageView)convertView.findViewById(R.id.movie_image);
-            movieTitle=(TextView)convertView.findViewById(R.id.movie_title);
+
         }
+        movieImage=(ImageView)convertView.findViewById(R.id.movie_image);
+        movieTitle=(TextView)convertView.findViewById(R.id.movie_title);
         Movie currentItem=movieList.get(position);
         String url=currentItem.getImageLink();
         String title=currentItem.getTitle();

@@ -16,7 +16,7 @@ public class DetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.frame_detail,new DetailFragment())
+                .replace(R.id.frame_detail,new DetailFragment())
                 .commit();
     }
 }

@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnIt
         toolbar=(Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.frame_main,new MainFragment())
+                .replace(R.id.frame_main,new MainFragment())
                 .commit();
 
 

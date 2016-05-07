@@ -6,8 +6,10 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.example.popularmovies.R;
+import com.example.popularmovies.UI.MainActivity;
 
 /**
  * Created by dilpreet on 24/2/16.
@@ -39,7 +41,18 @@ public class SettingsActivity extends Activity {
             if(preference instanceof ListPreference){
                 ListPreference listPreference=(ListPreference)preference;
                 int index=listPreference.findIndexOfValue(value);
-                listPreference.setSummary(listPreference.getEntries()[index]);
+
+                try {
+                    String oldSUm = listPreference.getSummary().toString();
+                    listPreference.setSummary(listPreference.getEntries()[index]);
+                    String newSUm = listPreference.getSummary().toString();
+
+                    if (newSUm.compareToIgnoreCase(oldSUm) != 0)
+                        MainActivity.restored = false;
+                }catch (NullPointerException e){
+                    listPreference.setSummary(listPreference.getEntries()[index]);
+                }
+
             }
             return true;
         }

@@ -65,9 +65,15 @@ public class DetailFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(trailerAdapter);
         if (savedInstanceState != null) {
+            setFields(savedInstanceState.getString("id"),savedInstanceState.getString("title"),
+                    savedInstanceState.getString("image"),savedInstanceState.getString("rating"),savedInstanceState.getString("release"),
+                    savedInstanceState.getString("synopsis"));
             reviewView.setText(savedInstanceState.getString("review"));
-            listVideo=savedInstanceState.getStringArrayList("movies");
-            Log.d("mytag","asd");
+            listVideo.clear();
+            listVideo.addAll(savedInstanceState.getStringArrayList("movies"));
+            trailerAdapter.notifyDataSetChanged();
+
+
         }
         else {
             try {
@@ -107,6 +113,12 @@ public class DetailFragment extends Fragment {
         super.onSaveInstanceState(outState);
         outState.putStringArrayList("movies",listVideo);
         outState.putString("review",reviewView.getText().toString());
+        outState.putString("id",mId);
+        outState.putString("title",mTitle);
+        outState.putString("rating",mRating);
+        outState.putString("image",mImageLink);
+        outState.putString("release",mRelease);
+        outState.putString("synopsis",mSynopsis);
     }
 
     public void setFields(String id, String title, String image, String rating, String release, String synopsis){
@@ -129,6 +141,7 @@ public class DetailFragment extends Fragment {
 
 
     private void loadVideos(String id){
+        listVideo.clear();
         StringRequest stringRequest=new StringRequest(Config.SUB_URL +id+ "/videos?api_key="+Config.API_KEY,
                 new Response.Listener<String>() {
                     @Override

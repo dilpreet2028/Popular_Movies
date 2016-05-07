@@ -42,19 +42,21 @@ public class MainFragment extends Fragment {
     MovieAdapter adapter;
     GridView gridView;
     OnItemClickData onItemClickData;
-    boolean restored;
+    SharedPreferences preferences;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_main,container,false);
         gridView=(GridView)view.findViewById(R.id.gridView);
-        restored=false;
+        preferences= PreferenceManager.getDefaultSharedPreferences(getContext());
 
         moviesList=new ArrayList<>();
         if(savedInstanceState!=null){
             moviesList=savedInstanceState.getParcelableArrayList("data");
-            Log.d("mytag","instance");
-            restored=true;
+            MainActivity.restored=true;
+            Log.d("mytag","check first this");
+
         }
 
         adapter=new MovieAdapter(moviesList,getActivity());
@@ -73,23 +75,40 @@ public class MainFragment extends Fragment {
 
 
 
+
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+
+        if(MainActivity.restored==false)
+        {
+            fetchMovies();
+            //After first run setting restored to true so that it doesnot calls fetchmovies until sort order changes
+            MainActivity.restored=true;
+        }
+
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList("data",moviesList);
+        outState.putString("type",preferences.getString(getString(R.string.sort_key),getString(R.string.sort_def_value)));
     }
 
 
     public interface OnItemClickData{
         public void provideData(String id,String title,String image,String rating,String release,String synopsis);
     }
-
+    Context context;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        this.context=context;
         try{
             onItemClickData=(OnItemClickData)context;
         }catch (ClassCastException e){
@@ -97,22 +116,13 @@ public class MainFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        if(!restored)
-        fetchMovies();
-
-    }
-
     private void fetchMovies(){
 
         SharedPreferences preferences= PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sortType=preferences.getString(getString(R.string.sort_key),getString(R.string.sort_def_value));
-        Log.d("mytag","start "+ restored);
+        Log.d("mytag","fetching");
         if(sortType.compareToIgnoreCase("fav")!=0)
-            new NetworkTask().execute();
+            new NetworkTask(context).execute();
         else{
             MoviesDb moviesDb=new MoviesDb(getActivity());
             moviesDb.getMovies(moviesList,adapter);
@@ -123,6 +133,13 @@ public class MainFragment extends Fragment {
     private class NetworkTask extends AsyncTask<Void,Void,Integer>{
         private final String TAG=MainFragment.class.getSimpleName();
         SharedPreferences preferences;
+        Context context;
+
+        public NetworkTask(Context context) {
+            super();
+            this.context=context;
+        }
+
         @Override
         protected Integer doInBackground(Void... params) {
             HttpURLConnection connection=null;
@@ -131,7 +148,7 @@ public class MainFragment extends Fragment {
             Integer result=0;
             String moviesJson;
 
-            preferences= PreferenceManager.getDefaultSharedPreferences(getActivity());
+            preferences= PreferenceManager.getDefaultSharedPreferences(context);
             String sortType=preferences.getString(getString(R.string.sort_key),getString(R.string.sort_def_value));
 
             try{
